@@ -17,8 +17,70 @@ import json, time, os
 import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
+import sqlite3
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import random
 
 load_dotenv()
+
+# --- Auth DB ---
+def init_db():
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('''CREATE TABLE IF NOT EXISTS authorized_users (email TEXT PRIMARY KEY)''')
+    conn.commit()
+    conn.close()
+
+def is_authorized(email):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT 1 FROM authorized_users WHERE email = ?', (email,))
+    result = cursor.fetchone()
+    conn.close()
+    return result is not None
+
+def add_email(email):
+    conn = sqlite3.connect('users.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute('INSERT INTO authorized_users (email) VALUES (?)', (email,))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        pass
+    finally:
+        conn.close()
+
+def send_otp_email(receiver_email, otp):
+    try:
+        sender_email = st.secrets["email_config"]["CAMPEX_EMAIL"]
+        sender_password = st.secrets["email_config"]["CAMPEX_PASSWORD"]
+        if sender_email == "ENTER_YOUR_EMAIL_HERE@gmail.com":
+            st.error("Please configure your actual email in .streamlit/secrets.toml")
+            print(f"\n[DEBUG] MAGIC OTP FOR {receiver_email}: {otp}\n")
+            return False
+    except Exception as e:
+        st.error("Email credentials not found. Please configure .streamlit/secrets.toml")
+        print(f"\n[DEBUG] MAGIC OTP FOR {receiver_email}: {otp}\n")
+        return False
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = receiver_email
+        msg['Subject'] = "CAMPEX System - Authentication OTP"
+        msg.attach(MIMEText(f"Your one-time password (OTP) is: {otp}\n\nPlease enter this to securely log in.", 'plain'))
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg)
+        server.quit()
+        return True
+    except Exception as e:
+        st.error(f"Failed to send email: {e}")
+        return False
+
+init_db()
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 BASE_DIR         = os.path.dirname(os.path.abspath(__file__))
@@ -117,6 +179,73 @@ div[data-testid="stVegaLiteChart"]{background:transparent!important;border-radiu
 div[data-testid="stMetricValue"],div[data-testid="metric-container"]{all:unset;}
 </style>
 """, unsafe_allow_html=True)
+
+# --- 3. State Management Requirements ---
+if 'auth_status' not in st.session_state:
+    st.session_state.auth_status = "unauthenticated"
+if 'current_user' not in st.session_state:
+    st.session_state.current_user = None
+if 'current_email' not in st.session_state:
+    st.session_state.current_email = None
+if 'generated_otp' not in st.session_state:
+    st.session_state.generated_otp = None
+
+# --- 4. UI & Flow Requirements ---
+if st.session_state.auth_status != "authenticated":
+    st.title("Secure Access")
+    
+    status = st.session_state.auth_status
+    
+    if status == "unauthenticated":
+        email = st.text_input("Email address", value=st.session_state.current_email or "")
+        send_btn = st.button("Send Magic OTP", type="primary")
+            
+        if send_btn and email:
+            st.session_state.current_email = email
+            otp = str(random.randint(100000, 999999))
+            st.session_state.generated_otp = otp
+            
+            # Auto-register flow
+            if not is_authorized(email):
+                st.session_state.auth_status = "awaiting_otp_register"
+            else:
+                st.session_state.auth_status = "awaiting_otp"
+                
+            if not send_otp_email(email, otp):
+                st.session_state.email_failed = True
+                
+            st.rerun()
+                
+    elif status in ["awaiting_otp", "awaiting_otp_register"]:
+        if st.session_state.get("email_failed"):
+            st.warning("⚠️ Email dispatch failed. The developer OTP was printed to the terminal console.")
+        else:
+            st.info(f"OTP has been sent to {st.session_state.current_email}")
+        
+        entered_otp = st.text_input("Enter 6-digit OTP", max_chars=6)
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("Verify OTP"):
+                if entered_otp == st.session_state.generated_otp:
+                    if status == "awaiting_otp_register":
+                        add_email(st.session_state.current_email)
+                        st.success("Registration successful!")
+                    st.session_state.current_user = st.session_state.current_email
+                    st.session_state.auth_status = "authenticated"
+                    st.rerun()
+                else:
+                    st.error("Invalid OTP. Please try again.")
+        with c2:
+            if st.button("Cancel"):
+                st.session_state.auth_status = "unauthenticated"
+                st.session_state.current_email = None
+                st.session_state.generated_otp = None
+                st.session_state.current_user = None
+                st.rerun()
+
+    st.stop() # Prevents rendering the rest of the dashboard
+
 
 
 # ── Session state ─────────────────────────────────────────────────────────────
@@ -282,6 +411,14 @@ st.markdown(f"""
   </div>
 </div>""", unsafe_allow_html=True)
 
+col1, col2 = st.columns([8, 1])
+with col2:
+    if st.button("Log Out"):
+        st.session_state.auth_status = "unauthenticated"
+        st.session_state.current_email = None
+        st.session_state.generated_otp = None
+        st.session_state.current_user = None
+        st.rerun()
 
 # ── Alert banner ──────────────────────────────────────────────────────────────
 if sys_mode in ("OFFLINE_EDGE", "OFFLINE_AIRGAP"):
