@@ -69,15 +69,27 @@ def send_otp_email(receiver_email, otp):
         msg['From'] = sender_email
         msg['To'] = receiver_email
         msg['Subject'] = "CAMPEX System - Authentication OTP"
-        msg.attach(MIMEText(f"Your one-time password (OTP) is: {otp}\n\nPlease enter this to securely log in.", 'plain'))
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        body = f"""Hello,
+
+Your one-time password (OTP) for CAMPEX access is:
+
+    {otp}
+
+This code is valid for your current session only. Please do not share it with anyone.
+
+— CAMPEX Security System"""
+        msg.attach(MIMEText(body, 'plain'))
+        server = smtplib.SMTP('smtp.gmail.com', 587, local_hostname='localhost', timeout=30)
+        server.ehlo()
         server.starttls()
+        server.ehlo()
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
         return True
     except Exception as e:
         st.error(f"Failed to send email: {e}")
+        print(f"\n[DEBUG] MAGIC OTP FOR {receiver_email}: {otp}\n")
         return False
 
 init_db()

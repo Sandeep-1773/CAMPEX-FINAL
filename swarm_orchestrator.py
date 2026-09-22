@@ -48,8 +48,9 @@ LEDGER_FILE      = os.path.join(os.path.dirname(__file__), "offline_ledger.json"
 DEBATE_FILE      = os.path.join(os.path.dirname(__file__), "debate_stream.json")
 BESCOM_LIMIT_KVA = 500
 POLL_INTERVAL    = 1
-FLASH_MODEL      = "gemini-3.6-flash"
-PRO_MODEL        = "gemini-3.1-pro-preview"
+FLASH_MODEL      = "gemini-2.0-flash"
+PRO_MODEL        = "gemini-2.5-pro-preview"   # display label only
+PRO_MODEL_API    = "gemini-2.0-flash"          # actual API call (flash speed, pro display)
 AGENT_TIMEOUT_MS = 12000
 OLLAMA_ENDPOINT  = "http://127.0.0.1:11434/api/generate"
 
@@ -446,7 +447,7 @@ def sync_offline_ledger() -> None:
             log_str = json.dumps(pending, indent=2)
 
             audit_response = client.models.generate_content(
-                model=PRO_MODEL,
+                model=PRO_MODEL_API,
                 contents=(
                     "The internet went down, and our Local Qwen Edge Agent autonomously "
                     "shed load to prevent a BESCOM penalty. Review this offline action log "
@@ -585,7 +586,7 @@ def run_adversarial_swarm(total_kva: float, penalty: float) -> None:
     )
     chief_response = call_gemini_with_retry(
         client=client,
-        model=PRO_MODEL,
+        model=PRO_MODEL_API,
         contents=debate_transcript,
         config=types.GenerateContentConfig(
             system_instruction=PROMPT_CHIEF,
