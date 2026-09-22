@@ -23,9 +23,11 @@ To make nuanced decisions during power spikes, CAMPEX relies on a 3-layer hierar
 ---
 
 ## 🛡️ The Ultimate Air-Gap Fallback (Edge Resilience)
-In industrial IoT, cloud APIs can fail. If the campus internet drops or the cloud LLM throttles the requests, CAMPEX instantly engages its **Zero-Hour Air-Gap Fallback**. 
+In industrial IoT, cloud APIs are a single point of failure. If the campus internet drops, or the primary LLM is rate-limited, CAMPEX intercepts the failure and instantly engages its **Zero-Hour Air-Gap Fallback** routine. 
 
-The orchestrator automatically reroutes the telemetry payload to a local **Qwen 2.5 (3B)** model running entirely offline on an edge GPU via Ollama. If the edge server itself is compromised, a hardcoded watchdog engages a mathematically safe 40% mechanical throttle. The campus is protected under all circumstances.
+1. **Edge AI Handover:** The `swarm_orchestrator` automatically reroutes the telemetry payload via a REST API to a local **Qwen 2.5 (3B)** model running entirely offline on an edge RTX GPU via Ollama. It prompts the edge model to output strict JSON verdicts identically to the cloud swarm.
+2. **Hardcoded Mechanical Watchdog:** If the local Ollama server crashes or the edge model hallucinates invalid JSON, a secondary exception handler trips a hardcoded "Mechanical Watchdog." This watchdog bypasses all AI and mathematically enforces a safe 40% mechanical throttle. 
+3. **Offline Ledger:** All edge decisions are logged to a local `offline_ledger.json` file for future cloud reconciliation. The campus is mathematically guaranteed to be protected under all circumstances.
 
 ---
 
@@ -41,6 +43,14 @@ CAMPEX provides two dedicated interfaces to visualize the chaos:
 To ensure the dashboard remains secure, it is guarded by a custom-built, zero-trust **Email OTP Authentication System**. 
 * **Auto-Registration Flow:** New users enter their email, an OTP is dispatched to their inbox, and verifying it securely adds them to the SQLite whitelist.
 * **Developer Bypass:** If SMTP credentials are not yet configured, the system gracefully falls back by printing the OTP to the terminal console, allowing uninterrupted local testing.
+
+---
+
+## 💻 Tech Stack
+* **AI & Orchestration:** Google Gemini 1.5 Flash (Cloud Swarm), Qwen 2.5 3B (Edge Fallback), Ollama
+* **Frontend & Visualization:** Streamlit, Pandas, HTML/CSS (Custom UI injections)
+* **Backend & Security:** Python 3.11, SQLite (Whitelist DB), `smtplib` (OTP Dispatch)
+* **CLI & Tooling:** Rich (Terminal UI), Dotenv
 
 ---
 
