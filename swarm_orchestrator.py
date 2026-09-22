@@ -51,6 +51,7 @@ POLL_INTERVAL    = 1
 FLASH_MODEL      = "gemini-3.8-flash"
 PRO_MODEL        = "gemini-2.5-pro"           # display label only
 PRO_MODEL_API    = "gemini-3.8-flash"          # actual API call — confirmed working
+FLASH_FALLBACKS  = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-flash-lite-latest"]  # 503 fallback chain
 AGENT_TIMEOUT_MS = 12000
 OLLAMA_ENDPOINT  = "http://127.0.0.1:11434/api/generate"
 
@@ -481,22 +482,28 @@ def sync_offline_ledger() -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def call_gemini_with_retry(client, model, contents, config=None, max_retries=3):
-    """Wraps Gemini API calls with a retry loop for 429/503 limits."""
+    """Wraps Gemini API calls with retry + model fallback chain for 429/503 limits."""
     import time
-    for attempt in range(max_retries):
-        try:
-            return client.models.generate_content(
-                model=model,
-                contents=contents,
-                config=config,
-            )
-        except Exception as e:
-            err_str = str(e)
-            if ("503" in err_str or "429" in err_str) and attempt < max_retries - 1:
-                console.print(f"[dim]Gemini API rate/load limit (429/503), retrying in 4s (Attempt {attempt+1}/{max_retries})...[/dim]")
-                time.sleep(4)
-            else:
-                raise e
+    models_to_try = [model] + FLASH_FALLBACKS
+    for model_attempt in models_to_try:
+        for attempt in range(max_retries):
+            try:
+                return client.models.generate_content(
+                    model=model_attempt,
+                    contents=contents,
+                    config=config,
+                )
+            except Exception as e:
+                err_str = str(e)
+                if "503" in err_str and attempt == max_retries - 1:
+                    console.print(f"[dim yellow]503 on {model_attempt}, switching to next fallback model...[/dim yellow]")
+                    break  # try next model in chain
+                elif ("503" in err_str or "429" in err_str) and attempt < max_retries - 1:
+                    console.print(f"[dim]Gemini API rate/load limit (attempt {attempt+1}/{max_retries}), retrying in 4s...[/dim]")
+                    time.sleep(4)
+                else:
+                    raise e
+    raise Exception("All Gemini models exhausted (503/429). Routing to offline fallback.")
 
 def run_adversarial_swarm(total_kva: float, penalty: float) -> None:
     """

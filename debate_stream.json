@@ -1,27 +1,27 @@
 [
   {
-    "timestamp": "16:11:58",
+    "timestamp": "16:16:25",
     "mode": "ONLINE_CLOUD",
     "active_agent": "GRID_ECONOMIST",
     "layer": "LAYER_1_FINANCIAL_RISK",
     "message": "Economist analysing penalty. Demand: 510.0 kVA | Exposure: \u20b93,600"
   },
   {
-    "timestamp": "16:11:58",
+    "timestamp": "16:16:44",
     "mode": "OFFLINE_EDGE",
     "active_agent": "QWEN_EDGE",
     "layer": "EDGE_FALLBACK",
-    "message": "Cloud unreachable (404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.', 'status': 'NOT_FOUND'}}). Routing to Local Qwen Edge Agent."
+    "message": "Cloud unreachable (503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}). Routing to Local Qwen Edge Agent."
   },
   {
-    "timestamp": "16:12:04",
+    "timestamp": "16:16:51",
     "mode": "OFFLINE_EDGE",
     "active_agent": "QWEN_EDGE",
     "layer": "EDGE_FALLBACK",
-    "message": "THINKING: To address the Campus load exceeding 500 kVA, we must prioritize the operational impact on the Stabilization and Protection Equipment (STP blowers) to ensure essential services, while reducing usage of Hostel pumps to alleviate grid strain.\nVERDICT: stp_blowers @ 80%"
+    "message": "THINKING: Given the campus load exceeds 500 kVA, the system needs to balance immediate power stability with potential grid constraints. Increasing the usage of STP blowers can help stabilize the power load quickly by reducing the overall demand, while minimizing the use of less flexible assets like hostel pumps.\nVERDICT: stp_blowers @ 80%"
   },
   {
-    "timestamp": "16:12:04",
+    "timestamp": "16:16:51",
     "mode": "ONLINE_CLOUD",
     "active_agent": "IDLE",
     "layer": "IDLE",
