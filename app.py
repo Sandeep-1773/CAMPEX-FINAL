@@ -486,7 +486,7 @@ with c1:
 with c2:
     st.markdown(f"""
     <div class="metric-card">
-      <div class="metric-label">💧 STP Blower Power</div>
+      <div class="metric-label">⚙️ Industrial Motor Power</div>
       <div style="font-size:2.6rem;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:8px;color:{stp_clr};text-shadow:0 0 20px rgba({stp_glow},0.4);">
         {stp_actual_kw:.1f} <span style="font-size:1.1rem;font-weight:500;color:#64748b;">kW</span></div>
       <div class="metric-delta {'down' if throttle > 0 else ''}">
@@ -496,7 +496,7 @@ with c2:
 with c3:
     st.markdown(f"""
     <div class="metric-card">
-      <div class="metric-label">⚡ STP Restart Inrush Risk</div>
+      <div class="metric-label">⚡ Grid Instability Index</div>
       <div style="font-size:2.6rem;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1;margin-bottom:8px;color:{inrush_clr};text-shadow:0 0 20px rgba({inrush_glow},0.4);">
         {inrush_risk:.1f} <span style="font-size:1.1rem;font-weight:500;color:#64748b;">x</span></div>
       <div class="metric-delta {'up' if inrush_risk > 3.0 else 'down'}">
