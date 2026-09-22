@@ -1,8 +1,8 @@
 {
-  "base_campus_kw": 330.0,
-  "apex_kw": 240.0,
+  "base_campus_kw": 350.0,
+  "apex_kw": 180.0,
   "ai_target": "stp_blowers",
-  "ai_throttle_percent": 50,
+  "ai_throttle_percent": 70,
   "system_mode": "ONLINE_CLOUD",
-  "active_agent": "CHIEF_ARBITRATOR"
+  "active_agent": "IDLE"
 }
