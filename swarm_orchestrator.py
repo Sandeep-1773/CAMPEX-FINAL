@@ -347,21 +347,19 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
     )
 
     try:
-        # Calculate minimum throttle mathematically to guarantee sub-500 kVA
-        # STP blowers = 70 kW. Savings = 70 * (throttle/100)
-        # Need: total_kva - savings < 500 → throttle > (total_kva - 500) / 70 * 100
+        # Calculate exact throttle needed to drop to 499 kVA (1 kVA below limit)
         STP_KW = 70.0
-        overshoot = max(0.0, total_kva - 500.0)
-        min_throttle_required = int(min(100, (overshoot / STP_KW) * 100) + 5)  # +5% safety margin
+        overshoot = max(0.0, total_kva - 499.0)
+        exact_throttle = int(min(100, (overshoot / STP_KW) * 100))
 
         payload = {
             "model": "qwen2.5:3b",
             "prompt": (
-                f"CAMPEX EMERGENCY: Campus load is {round(total_kva, 1)} kVA, exceeding the 500 kVA BESCOM limit by {round(overshoot, 1)} kW. "
-                f"The STP blowers consume 70 kW. To bring load below 500 kVA, throttle must be at least {min_throttle_required}%. "
+                f"CAMPEX EMERGENCY: Campus load is {round(total_kva, 1)} kVA, exceeding the 500 kVA limit. "
+                f"To bring it down to 499 kVA, we must throttle the STP blowers by exactly {exact_throttle}%. "
                 "Output a JSON object with three keys: 'reasoning' (1-sentence explanation), "
                 "'target_asset' (must be 'stp_blowers'), and "
-                f"'throttle_percent' (integer between {min_throttle_required} and 100, choose what is needed to safely reach below 500 kVA)."
+                f"'throttle_percent' (must be exactly {exact_throttle})."
             ),
             "stream": False,
             "format": "json",
@@ -383,21 +381,12 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
 
         result    = json.loads(result_text)
 
-        reasoning = str(result.get("reasoning", "Edge agent applied inrush-safe throttle."))
+        reasoning = str(result.get("reasoning", "Edge agent calculated exact safe throttle."))
         target    = str(result.get("target_asset", "stp_blowers"))
-        throttle  = int(result.get("throttle_percent", min_throttle_required))
-
-        # ── HARD GUARANTEE: override Qwen if throttle won't bring load below 500 ──
-        if throttle < min_throttle_required:
-            console.print(
-                f"[dim yellow]⚠ Qwen proposed {throttle}% (insufficient). "
-                f"Overriding to minimum required {min_throttle_required}%.[/dim yellow]"
-            )
-            reasoning += f" [SAFETY OVERRIDE: throttle raised to {min_throttle_required}% to guarantee sub-500 kVA.]"
-            throttle = min_throttle_required
-
-        # Clamp to valid range — no upper cap in offline mode, just must reach below 500
-        throttle = max(min_throttle_required, min(100, throttle))
+        
+        # ── MATHEMATICAL GUARANTEE: Force exact throttle to minimize Grid Instability ──
+        throttle = exact_throttle
+        reasoning += f" [MATH OVERRIDE: Exact {throttle}% throttle applied to hit 499 kVA.]"
 
         # Broadcast Qwen's thinking and verdict to the War Room TUI
         update_telemetry("OFFLINE_EDGE", "QWEN_EDGE", "EDGE_FALLBACK",
