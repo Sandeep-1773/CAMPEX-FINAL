@@ -361,7 +361,7 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
                 f"The STP blowers consume 70 kW. To bring load below 500 kVA, throttle must be at least {min_throttle_required}%. "
                 "Output a JSON object with three keys: 'reasoning' (1-sentence explanation), "
                 "'target_asset' (must be 'stp_blowers'), and "
-                f"'throttle_percent' (integer, must be at least {min_throttle_required} and no more than 40)."
+                f"'throttle_percent' (integer between {min_throttle_required} and 100, choose what is needed to safely reach below 500 kVA)."
             ),
             "stream": False,
             "format": "json",
@@ -396,8 +396,8 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
             reasoning += f" [SAFETY OVERRIDE: throttle raised to {min_throttle_required}% to guarantee sub-500 kVA.]"
             throttle = min_throttle_required
 
-        # Clamp to safe operational bounds (never exceed 40% to avoid inrush spike)
-        throttle = max(min_throttle_required, min(40, throttle))
+        # Clamp to valid range — no upper cap in offline mode, just must reach below 500
+        throttle = max(min_throttle_required, min(100, throttle))
 
         # Broadcast Qwen's thinking and verdict to the War Room TUI
         update_telemetry("OFFLINE_EDGE", "QWEN_EDGE", "EDGE_FALLBACK",

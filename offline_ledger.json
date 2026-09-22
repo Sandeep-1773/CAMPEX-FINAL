@@ -52,5 +52,41 @@
     "peak_kva": 521.0,
     "action_taken": "50% throttle by Local Qwen Edge Agent",
     "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:50:07",
+    "peak_kva": 535.0,
+    "action_taken": "75% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:50:17",
+    "peak_kva": 517.5,
+    "action_taken": "70% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:50:24",
+    "peak_kva": 521.0,
+    "action_taken": "70% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:50:35",
+    "peak_kva": 521.0,
+    "action_taken": "80% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:50:44",
+    "peak_kva": 514.0,
+    "action_taken": "70% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:51:01",
+    "peak_kva": 521.0,
+    "action_taken": "30% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
   }
 ]
