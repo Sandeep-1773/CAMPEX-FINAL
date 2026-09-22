@@ -1,14 +1,8 @@
 [
   {
-    "timestamp": "2026-09-22T16:04:00",
+    "timestamp": "2026-09-22T16:11:58",
     "peak_kva": 510.0,
-    "action_taken": "50% throttle by Local Qwen Edge Agent",
-    "status": "pending_sync"
-  },
-  {
-    "timestamp": "2026-09-22T16:04:05",
-    "peak_kva": 510.0,
-    "action_taken": "40% throttle by Local Qwen Edge Agent",
+    "action_taken": "80% throttle by Local Qwen Edge Agent",
     "status": "pending_sync"
   }
 ]

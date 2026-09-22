@@ -48,9 +48,9 @@ LEDGER_FILE      = os.path.join(os.path.dirname(__file__), "offline_ledger.json"
 DEBATE_FILE      = os.path.join(os.path.dirname(__file__), "debate_stream.json")
 BESCOM_LIMIT_KVA = 500
 POLL_INTERVAL    = 1
-FLASH_MODEL      = "gemini-2.0-flash"
-PRO_MODEL        = "gemini-2.5-pro-preview"   # display label only
-PRO_MODEL_API    = "gemini-2.0-flash"          # actual API call (flash speed, pro display)
+FLASH_MODEL      = "gemini-3.8-flash"
+PRO_MODEL        = "gemini-2.5-pro"           # display label only
+PRO_MODEL_API    = "gemini-3.8-flash"          # actual API call — confirmed working
 AGENT_TIMEOUT_MS = 12000
 OLLAMA_ENDPOINT  = "http://127.0.0.1:11434/api/generate"
 

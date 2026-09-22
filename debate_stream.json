@@ -1,97 +1,27 @@
 [
   {
-    "timestamp": "16:03:41",
+    "timestamp": "16:11:58",
     "mode": "ONLINE_CLOUD",
     "active_agent": "GRID_ECONOMIST",
     "layer": "LAYER_1_FINANCIAL_RISK",
     "message": "Economist analysing penalty. Demand: 510.0 kVA | Exposure: \u20b93,600"
   },
   {
-    "timestamp": "16:03:42",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "GRID_ECONOMIST",
-    "layer": "LAYER_1_FINANCIAL_RISK",
-    "message": "Economist analysing penalty. Demand: 510.0 kVA | Exposure: \u20b93,600"
-  },
-  {
-    "timestamp": "16:03:48",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "GRID_ECONOMIST",
-    "layer": "LAYER_1_FINANCIAL_RISK",
-    "message": "Breaching the 500 kVA limit by 10.0 kVA is incurring a direct financial penalty of \u20b93,600, demanding an immediate and aggressive load-shed action to halt ongoing financial losses. I order a 100% shutdown of stp_blowers effective immediately to eliminate this excess demand and restore profitability."
-  },
-  {
-    "timestamp": "16:03:48",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "SUBSTATION_ENGINEER",
-    "layer": "LAYER_2_POWER_STABILITY",
-    "message": "Substation Engineer reviewing Economist proposal for inrush risk\u2026"
-  },
-  {
-    "timestamp": "16:03:48",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "GRID_ECONOMIST",
-    "layer": "LAYER_1_FINANCIAL_RISK",
-    "message": "Exceeding the threshold by 10.0 kVA incurs a direct financial penalty of \u20b93,600, demanding an immediate and aggressive load-shed action to halt escalating losses. My exact proposal is a 100% shutdown of stp_blowers to eliminate the excess load instantly."
-  },
-  {
-    "timestamp": "16:03:48",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "SUBSTATION_ENGINEER",
-    "layer": "LAYER_2_POWER_STABILITY",
-    "message": "Substation Engineer reviewing Economist proposal for inrush risk\u2026"
-  },
-  {
-    "timestamp": "16:03:56",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "SUBSTATION_ENGINEER",
-    "layer": "LAYER_2_POWER_STABILITY",
-    "message": "I veto the Economist's proposal because a 100% shutdown of the stp_blowers will trigger a 6.0x inrush current spike upon restart, tripping the main campus transformer and causing a complete blackout with severe hardware damage. My counter-offer is a maximum 40% throttle on the stp_blowers, which reduces the required kW load while keeping the motors spinning to cap the inrush risk at a safe 3.0x multiplier."
-  },
-  {
-    "timestamp": "16:03:56",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "CHIEF_ARBITRATOR",
-    "layer": "LAYER_3_ARBITRATION",
-    "message": "Chief Arbitrator synthesising debate transcript and binding verdict\u2026"
-  },
-  {
-    "timestamp": "16:04:00",
+    "timestamp": "16:11:58",
     "mode": "OFFLINE_EDGE",
     "active_agent": "QWEN_EDGE",
     "layer": "EDGE_FALLBACK",
-    "message": "Cloud unreachable (The read operation timed out). Routing to Local Qwen Edge Agent."
+    "message": "Cloud unreachable (404 NOT_FOUND. {'error': {'code': 404, 'message': 'This model models/gemini-2.0-flash is no longer available. Please update your code to use models/gemini-3.6-flash for the latest features and improvements. We recommend you to use the Interactions API.', 'status': 'NOT_FOUND'}}). Routing to Local Qwen Edge Agent."
   },
   {
-    "timestamp": "16:04:05",
+    "timestamp": "16:12:04",
     "mode": "OFFLINE_EDGE",
     "active_agent": "QWEN_EDGE",
     "layer": "EDGE_FALLBACK",
-    "message": "Cloud unreachable (429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\nPlease retry in 54.121939311s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '54s'}]}}). Routing to Local Qwen Edge Agent."
+    "message": "THINKING: To address the Campus load exceeding 500 kVA, we must prioritize the operational impact on the Stabilization and Protection Equipment (STP blowers) to ensure essential services, while reducing usage of Hostel pumps to alleviate grid strain.\nVERDICT: stp_blowers @ 80%"
   },
   {
-    "timestamp": "16:04:07",
-    "mode": "OFFLINE_EDGE",
-    "active_agent": "QWEN_EDGE",
-    "layer": "EDGE_FALLBACK",
-    "message": "THINKING: Given the campus load exceeds 500 kVA, there is a risk of power instability as additional demand might strain the grid. Balancing power stability and grid constraints requires strategic management, possibly through reducing the operation of high-demand assets like stp_blowers or hostel_pumps to ensure reliability.\nVERDICT: stp_blowers @ 50%"
-  },
-  {
-    "timestamp": "16:04:07",
-    "mode": "ONLINE_CLOUD",
-    "active_agent": "IDLE",
-    "layer": "IDLE",
-    "message": "Crisis resolved. Watchdog standing by."
-  },
-  {
-    "timestamp": "16:04:17",
-    "mode": "OFFLINE_EDGE",
-    "active_agent": "QWEN_EDGE",
-    "layer": "EDGE_FALLBACK",
-    "message": "THINKING: Given the Campus load exceeds 500 kVA, we need to make a decision between either the stp_blowers or the hostel_pumps to maintain power stability. If we choose to throttle the stp_blowers, we can reduce power usage without significantly impacting the air quality in the Campus. On the other hand, throttling the hostel_pumps will affect the water supply in the Hostel, which could lead to discomfort for residents. Thus, we must consider the balance between operational needs and the impact on residents and air quality.\nVERDICT: hostel_pumps @ 40%"
-  },
-  {
-    "timestamp": "16:04:17",
+    "timestamp": "16:12:04",
     "mode": "ONLINE_CLOUD",
     "active_agent": "IDLE",
     "layer": "IDLE",
