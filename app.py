@@ -100,7 +100,6 @@ STATE_FILE       = os.path.join(BASE_DIR, "state.json")
 TEMP_FILE        = os.path.join(BASE_DIR, "state_app_temp.json")
 DEBATE_FILE      = os.path.join(BASE_DIR, "debate_stream.json")
 BESCOM_LIMIT_KVA = 500
-GOOGLE_MAPS_KEY  = os.getenv("GOOGLE_MAPS_KEY", "")
 
 # Baseline values (what state.json starts at after orchestrator boot)
 BASE_CAMPUS_KW_DEFAULT = 330.0
@@ -610,60 +609,70 @@ def map_color(power, is_apex=False):
     return "#00C853"
 
 LOCATIONS = [
-    ("MSRIT ESB-2",          13.02980, 77.56660, t_data.get("esb_kw",80),          False),
-    ("DES Block",            13.02920, 77.56700, t_data.get("desh_block_kw",110),  False),
-    ("MSRIT Apex Block",     13.02890, 77.56740, t_data.get("apex_block_kw",120),  True),
-    ("LHC",                  13.02850, 77.56680, t_data.get("lhc_kw",105),         False),
-    ("Multipurpose Hall",    13.02950, 77.56830, t_data.get("multipurpose_kw",60), False),
-    ("Architecture Dept",    13.02820, 77.56600, t_data.get("architecture_kw",45), False),
-    ("Workshop Block",       13.02780, 77.56620, t_data.get("workshop_kw",75),     False),
-    ("Quadrangle",           13.02900, 77.56650, 20.0,                             False),
-    ("MSRIT Boys Hostel",    13.02800, 77.56650, t_data.get("hostel_grid_kw",95),  False),
-    ("MSRIT STP",            13.02750, 77.56900, stp_actual_kw,                    False),
+    # Coordinates corrected from OSM campus map (campus center ~13.02997, 77.56497)
+    ("MSRIT ESB-2",          13.03275, 77.56530, t_data.get("esb_kw",80),          False),
+    ("DES Block",            13.03250, 77.56500, t_data.get("desh_block_kw",110),  False),
+    ("MSRIT Apex Block",     13.03197, 77.56477, t_data.get("apex_block_kw",120),  True),
+    ("LHC",                  13.03215, 77.56450, t_data.get("lhc_kw",105),         False),
+    ("Multipurpose Hall",    13.03265, 77.56487, t_data.get("multipurpose_kw",60), False),
+    ("Architecture Block",   13.03219, 77.56549, t_data.get("architecture_kw",45), False),
+    ("Workshop Block",       13.03165, 77.56430, t_data.get("workshop_kw",75),     False),
+    ("Quadrangle",           13.03230, 77.56465, 20.0,                             False),
+    ("MSRIT Boys Hostel",    13.03324, 77.56393, t_data.get("hostel_grid_kw",95),  False),
+    ("MSRIT STP",            13.03120, 77.56550, stp_actual_kw,                    False),
 ]
 locs_js = ",\n".join([
     f"{{ title: '{t}', lat: {la}, lng: {lo}, power: {p:.1f}, color: '{map_color(p,ia)}' }}"
     for t, la, lo, p, ia in LOCATIONS
 ])
-maps_src = f"https://maps.googleapis.com/maps/api/js?key={GOOGLE_MAPS_KEY}&callback=initMap" if GOOGLE_MAPS_KEY else "https://maps.googleapis.com/maps/api/js?callback=initMap"
-
 map_html = f"""<!DOCTYPE html><html><head>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   #map{{height:500px;width:100%;border-radius:12px;}}
-  html,body{{height:100%;margin:0;padding:0;background:#050d1a;}}
-  .gm-style .gm-style-iw-c{{background:#0f1f3d!important;border:1px solid rgba(56,189,248,0.3)!important;border-radius:10px!important;}}
+  html,body{{height:100%;margin:0;padding:0;background:#f0f4f8;}}
+  .leaflet-popup-content-wrapper{{background:#ffffff!important;border:1px solid #cbd5e1!important;border-radius:10px!important;color:#1e293b;box-shadow:0 4px 16px rgba(0,0,0,0.15)!important;}}
+  .leaflet-popup-tip{{background:#ffffff!important;}}
   .info-box{{font-family:'Inter',sans-serif;padding:4px;}}
-  .info-title{{font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:6px;}}
+  .info-title{{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:6px;}}
   .info-kw{{font-size:18px;font-weight:900;font-family:monospace;}}
   .info-risk{{font-size:10px;font-weight:700;letter-spacing:2px;margin-top:4px;}}
 </style></head><body>
 <div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-function initMap(){{
-  var map=new google.maps.Map(document.getElementById('map'),{{
-    zoom:16.5, center:{{lat:13.0289,lng:77.5674}}, mapTypeId:'roadmap',
-    styles:[
-      {{featureType:'all',elementType:'geometry',stylers:[{{color:'#0a1628'}}]}},
-      {{featureType:'all',elementType:'labels.text.fill',stylers:[{{color:'#7b93b7'}}]}},
-      {{featureType:'all',elementType:'labels.text.stroke',stylers:[{{color:'#050d1a'}}]}},
-      {{featureType:'road',elementType:'geometry',stylers:[{{color:'#132238'}}]}},
-      {{featureType:'water',elementType:'geometry',stylers:[{{color:'#030c1a'}}]}},
-      {{featureType:'poi',elementType:'geometry',stylers:[{{color:'#0d1e35'}}]}},
-      {{featureType:'landscape',elementType:'geometry',stylers:[{{color:'#0a1628'}}]}},
-      {{elementType:'labels.icon',stylers:[{{visibility:'off'}}]}}
-    ]
+  var map = L.map('map', {{zoomControl:true}}).setView([13.03230, 77.56490], 17);
+  L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png', {{
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abc',
+    maxZoom: 20
+  }}).addTo(map);
+
+  var locations = [{locs_js}];
+  locations.forEach(function(loc) {{
+    var riskLabel = loc.power >= 110 ? 'HIGH RISK' : (loc.power >= 80 ? 'MEDIUM RISK' : 'NORMAL');
+    var popupContent = '<div class="info-box"><div class="info-title">' + loc.title +
+      '</div><div class="info-kw" style="color:' + loc.color + '">' + loc.power.toFixed(1) +
+      ' kW</div><div class="info-risk" style="color:' + loc.color + '">' + riskLabel + '</div></div>';
+
+    // Draw circle
+    L.circle([loc.lat, loc.lng], {{
+      color: loc.color, weight: 2, opacity: 0.9,
+      fillColor: loc.color, fillOpacity: 0.25, radius: 38
+    }}).addTo(map);
+
+    // Draw marker with custom colored dot icon
+    var dotIcon = L.divIcon({{
+      className: '',
+      html: '<div style="width:14px;height:14px;border-radius:50%;background:' + loc.color +
+            ';border:2px solid #fff;box-shadow:0 0 6px ' + loc.color + ';"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+      popupAnchor: [0, -10]
+    }});
+    L.marker([loc.lat, loc.lng], {{icon: dotIcon}}).addTo(map).bindPopup(popupContent);
   }});
-  var locations=[{locs_js}];
-  locations.forEach(function(loc){{
-    var riskLabel=loc.power>=110?'HIGH RISK':(loc.power>=80?'MEDIUM RISK':'NORMAL');
-    new google.maps.Circle({{strokeColor:loc.color,strokeOpacity:0.9,strokeWeight:2,fillColor:loc.color,fillOpacity:0.18,map:map,center:{{lat:loc.lat,lng:loc.lng}},radius:38}});
-    var iw=new google.maps.InfoWindow({{content:'<div class="info-box"><div class="info-title">'+loc.title+'</div><div class="info-kw" style="color:'+loc.color+'">'+loc.power.toFixed(1)+' kW</div><div class="info-risk" style="color:'+loc.color+'">'+riskLabel+'</div></div>'}});
-    var mk=new google.maps.Marker({{position:{{lat:loc.lat,lng:loc.lng}},map:map,title:loc.title,icon:'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|'+loc.color.replace('#','')}});
-    mk.addListener('click',function(){{iw.open(map,mk);}});
-  }});
-}}
 </script>
-<script async defer src="{maps_src}"></script>
 </body></html>"""
 
 st.markdown('<div class="map-wrapper">', unsafe_allow_html=True)

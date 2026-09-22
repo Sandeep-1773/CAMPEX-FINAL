@@ -1,8 +1,56 @@
 [
   {
-    "timestamp": "2026-09-22T16:16:44",
+    "timestamp": "2026-09-22T16:32:04",
     "peak_kva": 510.0,
-    "action_taken": "80% throttle by Local Qwen Edge Agent",
-    "status": "synced"
+    "action_taken": "50% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:42:09",
+    "peak_kva": 535.0,
+    "action_taken": "70% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:42:20",
+    "peak_kva": 521.0,
+    "action_taken": "50% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:42:29",
+    "peak_kva": 535.0,
+    "action_taken": "50% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:42:48",
+    "peak_kva": 535.0,
+    "action_taken": "30% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:43:10",
+    "peak_kva": 549.0,
+    "action_taken": "50% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:43:30",
+    "peak_kva": 535.0,
+    "action_taken": "75% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:43:50",
+    "peak_kva": 517.5,
+    "action_taken": "70% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
+  },
+  {
+    "timestamp": "2026-09-22T16:44:09",
+    "peak_kva": 521.0,
+    "action_taken": "50% throttle by Local Qwen Edge Agent",
+    "status": "pending_sync"
   }
 ]

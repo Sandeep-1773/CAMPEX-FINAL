@@ -347,14 +347,21 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
     )
 
     try:
+        # Calculate minimum throttle mathematically to guarantee sub-500 kVA
+        # STP blowers = 70 kW. Savings = 70 * (throttle/100)
+        # Need: total_kva - savings < 500 → throttle > (total_kva - 500) / 70 * 100
+        STP_KW = 70.0
+        overshoot = max(0.0, total_kva - 500.0)
+        min_throttle_required = int(min(100, (overshoot / STP_KW) * 100) + 5)  # +5% safety margin
+
         payload = {
             "model": "qwen2.5:3b",
             "prompt": (
-                "CAMPEX EMERGENCY: Campus load exceeded 500 kVA. "
-                "Analyze the power stability and grid constraints, then output a JSON object "
-                "containing three keys: 'reasoning' (a 2-sentence analysis of trade-offs), "
-                "'target_asset' ('stp_blowers' or 'hostel_pumps'), and "
-                "'throttle_percent' (integer 10-100)."
+                f"CAMPEX EMERGENCY: Campus load is {round(total_kva, 1)} kVA, exceeding the 500 kVA BESCOM limit by {round(overshoot, 1)} kW. "
+                f"The STP blowers consume 70 kW. To bring load below 500 kVA, throttle must be at least {min_throttle_required}%. "
+                "Output a JSON object with three keys: 'reasoning' (1-sentence explanation), "
+                "'target_asset' (must be 'stp_blowers'), and "
+                f"'throttle_percent' (integer, must be at least {min_throttle_required} and no more than 40)."
             ),
             "stream": False,
             "format": "json",
@@ -365,7 +372,6 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
         response.raise_for_status()
 
         result_text = response.json().get("response", "{}")
-        # Strip potential markdown backticks from local LLMs
         result_text = result_text.strip()
         if result_text.startswith("```json"):
             result_text = result_text[7:]
@@ -374,18 +380,27 @@ def run_local_qwen_agent(total_kva: float, penalty: float) -> None:
         if result_text.endswith("```"):
             result_text = result_text[:-3]
         result_text = result_text.strip()
-        
-        result      = json.loads(result_text)
+
+        result    = json.loads(result_text)
 
         reasoning = str(result.get("reasoning", "Edge agent applied inrush-safe throttle."))
         target    = str(result.get("target_asset", "stp_blowers"))
-        throttle  = int(result.get("throttle_percent", 40))
+        throttle  = int(result.get("throttle_percent", min_throttle_required))
 
-        # Clamp throttle to safe bounds
-        throttle = max(10, min(100, throttle))
+        # ── HARD GUARANTEE: override Qwen if throttle won't bring load below 500 ──
+        if throttle < min_throttle_required:
+            console.print(
+                f"[dim yellow]⚠ Qwen proposed {throttle}% (insufficient). "
+                f"Overriding to minimum required {min_throttle_required}%.[/dim yellow]"
+            )
+            reasoning += f" [SAFETY OVERRIDE: throttle raised to {min_throttle_required}% to guarantee sub-500 kVA.]"
+            throttle = min_throttle_required
+
+        # Clamp to safe operational bounds (never exceed 40% to avoid inrush spike)
+        throttle = max(min_throttle_required, min(40, throttle))
 
         # Broadcast Qwen's thinking and verdict to the War Room TUI
-        update_telemetry("OFFLINE_EDGE", "QWEN_EDGE", "EDGE_FALLBACK", 
+        update_telemetry("OFFLINE_EDGE", "QWEN_EDGE", "EDGE_FALLBACK",
                          f"THINKING: {reasoning}\nVERDICT: {target} @ {throttle}%")
 
         print_offline_agent(reasoning, target, throttle)
